@@ -34,6 +34,15 @@ const index = () => {
     getTodo();
   };
 
+  const updateTodo = async (id) => {
+    let result = await axios.put(`${URL}/${id}`, {
+      title,
+      status,
+    });
+    console.log(result);
+    getTodo();
+  };
+
   const showTodo = () => {
     if (todo && todo.length) {
       return todo.map((item, index) => {
@@ -46,7 +55,12 @@ const index = () => {
             >
               Get
             </button>
-            <button className={styles.button}>Update</button>
+            <button
+              className={styles.button}
+              onClick={() => updateTodo(item.id)}
+            >
+              Update
+            </button>
             <button className={styles.button}>Delete</button>
           </li>
         );
