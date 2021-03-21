@@ -43,6 +43,11 @@ const index = () => {
     getTodo();
   };
 
+  const deleteTodo = async (id) => {
+    let result = await axios.delete(`${URL}/${id}`);
+    getTodo();
+  };
+
   const showTodo = () => {
     if (todo && todo.length) {
       return todo.map((item, index) => {
@@ -61,7 +66,12 @@ const index = () => {
             >
               Update
             </button>
-            <button className={styles.button}>Delete</button>
+            <button
+              className={styles.button}
+              onClick={() => deleteTodo(item.id)}
+            >
+              Delete
+            </button>
           </li>
         );
       });
