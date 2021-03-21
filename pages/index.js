@@ -81,6 +81,9 @@ const index = () => {
   };
   return (
     <div className={styles.container}>
+      <p>
+        <a href="/swr">คลิ๊กไปหน้าถัดไป SWR</a>
+      </p>
       <h2>Todo list</h2>
       <div>{showTodo()}</div>
       <h2>Select</h2>
