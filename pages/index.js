@@ -1,78 +1,41 @@
+import useSWR, { mutate } from "swr";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import styles from "../styles/Home.module.css";
-const URL = "http://localhost:6969/api/todo";
-
+//import styles from "../styles/Home.module.css";
+import styles from "../styles/Index.module.css";
+import Link from 'next/link'
+const URL = "http://localhost:3001/api/pets";
+const URL_BUY = "http://localhost:3001/api/purchase";
+const fetcher = (key) => fetch(key).then((res) => res.json());
 const index = () => {
-  const [todo, setTodo] = useState({});
-  const [s_todo, setS_todo] = useState({});
-  const [title, setTitle] = useState("");
-  const [status, setStatus] = useState("");
-  console.log(todo);
+  const { data, error } = useSWR(URL, fetcher, { revalidateOnFocus: false });
+  if (error) return <div>failed to load</div>;
+  if (!data) return <div>Loading...</div>;
+  console.log("data", data);
+  
+  const buyPet = async (id) => {
+    let result = await axios.post(`${URL_BUY}/${id}`)
+    mutate(URL, data);
+  }
 
-  useEffect(() => {
-    getTodo();
-  }, []);
-
-  const getTodo = async () => {
-    let result = await axios.get(URL);
-    setTodo(result.data.list);
-  };
-
-  const getTodoById = async (id) => {
-    let result = await axios.get(`${URL}/${id}`);
-    console.log(result.data);
-    setS_todo(result.data);
-  };
-
-  const addTodo = async () => {
-    let result = await axios.post(URL, {
-      title,
-      status,
-    });
-    console.log(result);
-    getTodo();
-  };
-
-  const updateTodo = async (id) => {
-    let result = await axios.put(`${URL}/${id}`, {
-      title,
-      status,
-    });
-    console.log(result);
-    getTodo();
-  };
-
-  const deleteTodo = async (id) => {
-    let result = await axios.delete(`${URL}/${id}`);
-    getTodo();
-  };
-
-  const showTodo = () => {
-    if (todo && todo.length) {
-      return todo.map((item, index) => {
+  const showPets = () => {
+    if (data.list && data.list.length) {
+      return data.list.map((item, index) => {
         return (
-          <li key={index}>
-            <b>Title :</b> {item.title} <b>Status :</b> {item.status}
+          <div className={styles.listItem} key={index}>
+            <div><b>Price :</b> {item.price}</div>
+            <div><b>Weight :</b> {item.weight}</div>
+             <div> <b>Age :</b> {item.age} </div>
+            <div><b>Type :</b> {item.type}</div>
+            
+            <div>
             <button
-              className={styles.button}
-              onClick={() => getTodoById(item.id)}
+              className={styles.btn}
+              onClick={() => buyPet(item.id)}
             >
-              Get
-            </button>
-            <button
-              className={styles.button}
-              onClick={() => updateTodo(item.id)}
-            >
-              Update
-            </button>
-            <button
-              className={styles.button}
-              onClick={() => deleteTodo(item.id)}
-            >
-              Delete
-            </button>
-          </li>
+              Buy
+            </button></div>
+          </div>
         );
       });
     } else {
@@ -81,29 +44,11 @@ const index = () => {
   };
   return (
     <div className={styles.container}>
-      <p>
-        <a href="/swr">คลิ๊กไปหน้าถัดไป SWR</a>
-      </p>
-      <h2>Todo list</h2>
-      <div>{showTodo()}</div>
-      <h2>Select</h2>
-      <p>
-        <b>Title :</b> {s_todo.title} <b>Status :</b> {s_todo.status}
-      </p>
-      <h2>Add todo</h2>
-      Title:{" "}
-      <input
-        type="text"
-        name="title"
-        onChange={(e) => setTitle(e.target.value)}
-      ></input>
-      status:{" "}
-      <input
-        type="text"
-        name="status"
-        onChange={(e) => setStatus(e.target.value)}
-      ></input>
-      <button onClick={() => addTodo(title, status)}>Add</button>
+      <div className={styles.title}>PET SHOP</div>
+      <div className={styles.list}>
+        {showPets()}
+      </div>
+      
     </div>
   );
 };
